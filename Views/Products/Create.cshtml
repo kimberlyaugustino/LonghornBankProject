@@ -1,0 +1,40 @@
+﻿@using LonghornBankProject.Controllers
+@model LonghornBankProject.Models.Product
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Create An Account</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Banking Product</h4>
+        <hr />
+
+        <div class="form-group">
+            <div class="form-check">
+                Account Type: @Html.DropDownList("SelectedProduct", EnumHelper.GetSelectList(typeof(AccountType)), new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            Initial Balance: @Html.TextBox("Balance", null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Balance, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

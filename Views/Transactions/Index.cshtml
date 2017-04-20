@@ -1,0 +1,61 @@
+﻿@model IEnumerable<LonghornBankProject.Models.Transaction>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2 style="text-align:left;float:left;">@ViewBag.AccountName</h2> 
+<h1 style="text-align:right;float:right;">$@ViewBag.Balance</h1> 
+<hr style="clear:both;"/>
+
+<p>
+    @Html.ActionLink("Make A Transaction", "Create", null, new { id = ViewBag.ProductID }, null)
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Date)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.TransactionType)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Amount)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Comments)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Date)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.TransactionType)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Amount)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Comments)
+        </td>
+        <td>
+            @Html.ActionLink("Details", "Details", new { id=item.TransactionID })
+        </td>
+    </tr>
+}
+
+</table>
+
+<div>
+    @Html.ActionLink("Back to List", "Index", "Products", new { id = ViewBag.ProductID }, null)
+</div>
