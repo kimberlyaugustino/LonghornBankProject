@@ -1,0 +1,19 @@
+﻿@model LonghornBankProject.Models.Transaction
+
+@{
+    ViewBag.Title = "ConfirmDispute";
+}
+
+<h2>Confirm Dispute</h2>
+
+<div>
+    Dispute has been submitted.
+</div>
+
+<div>
+    @Html.ActionLink("Ok", "Details", "Transactions", new { id = ViewBag.id}, null)
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

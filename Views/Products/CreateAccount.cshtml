@@ -1,0 +1,45 @@
+﻿@using LonghornBankProject.Controllers
+@model LonghornBankProject.Models.Product
+
+@{
+    ViewBag.Title = "SetInitialDeposit";
+}
+
+<h2>Set Initial Deposit</h2>
+
+
+@using (Html.BeginForm("CreateAccount", "Products", FormMethod.Post)) 
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <h4>Product</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        
+        <div class="form-group">
+            <div class="form-check">
+                Account Type: @Html.DropDownList("SelectedProduct", EnumHelper.GetSelectList(typeof(AccountType)), new { @class = "form-control" })
+            </div>
+        </div>
+        
+        <div class="form-group">
+            Initial Balance: @Html.TextBox("Balance", null, new { @class = "form-control" })
+            @Html.ValidationMessageFor(model => model.Balance, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script src="~/Scripts/jquery.validate.min.js"></script>
+<script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>

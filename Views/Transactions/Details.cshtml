@@ -1,0 +1,123 @@
+﻿@model LonghornBankProject.Models.TransactionDetail
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Transaction</h4>
+    <h5>@ViewBag.message</h5>
+    <hr />
+    
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.TransactionID)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.TransactionID)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.Date)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.Date)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.TransactionType)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.TransactionType)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.Description)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.Description)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.Amount)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.Amount)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.transaction.Comments)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.transaction.Comments)
+        </dd>
+
+    </dl>
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().TransactionID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().TransactionType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().Description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().Amount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.transactions.FirstOrDefault().Comments)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model.transactions)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Date)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TransactionID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TransactionType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Comments)
+                </td>
+                <td>
+                    @Html.ActionLink("Details", "Details", new { id = item.TransactionID })
+                </td>
+            </tr>
+        }
+
+    </table>
+</div>
+<p>
+    @if (Model.dispute == null)
+    {
+        @Html.ActionLink("Dispute", "Create", "Disputes", new { id = Model.transaction.TransactionID }, null);
+    }
+    @Html.ActionLink("Back to List", "Index", new { id = Model.transaction.Account.ProductID })
+</p>

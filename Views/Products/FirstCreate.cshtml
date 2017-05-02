@@ -1,0 +1,54 @@
+﻿@model LonghornBankProject.Models.Product
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<h2>Select Account Type</h2>
+
+
+@using (Html.BeginForm()) 
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Banking Product</h4>
+        <hr />
+
+        <div class="form-group">
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedProduct", "Checking", true, new { @class = "form-check-input" }) Checking
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedProduct", "Savings", new { @class = "form-check-input" }) Savings
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedProduct", "IRA", new { @class = "form-check-input" }) IRA
+                </label>
+            </div>
+
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedProduct", "Stock", new { @class = "form-check-input" }) Stock
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

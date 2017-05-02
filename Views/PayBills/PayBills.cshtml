@@ -1,0 +1,66 @@
+﻿@model IEnumerable<LonghornBankProject.Models.Transaction>
+
+@{
+    ViewBag.Title = "PayBills";
+}
+
+<h2>Pay My Bills</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <p>
+        @Html.ActionLink("Create New Payee", "CreatePayee")
+    </p>
+    <p>
+        @Html.ActionLink("Add Payee", "AddPayee")
+    </p>
+
+    <div class="form-group">
+        Pay From: @Html.DropDownList("ProductID", (SelectList)ViewBag.AllAccounts, new { @class = "form-control" })
+    </div>
+
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Payee.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Payee.Type)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amount)
+            </th>
+            <th></th>
+        </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Payee.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Payee.Type)
+            </td>
+            <td>
+                @Html.EditorFor(modelItem => item.Date, new { htmlAttributes = new { @class = "form-control" } })
+            </td>
+            <td>
+                @Html.EditorFor(modelItem => item.Amount, new { htmlAttributes = new { @class = "form-control" } })
+            </td>
+            <td>
+                @Html.ActionLink("Details", "PayeeDetails", new { id = item.Payee.PayeeID }) |
+                @Html.ActionLink("Delete", "Delete", new { id = item })
+                <input type="submit" value="Pay" class="btn btn-default" />
+            </td>
+        </tr>
+    }
+
+    </table>
+
+
+}
