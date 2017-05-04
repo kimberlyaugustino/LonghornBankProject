@@ -38,19 +38,13 @@ namespace LonghornBankProject.Controllers
             return list;
         }
 
-        public MultiSelectList GetAllPayees(AppUser user)
+        public SelectList GetAllPayees()
         {
-            var query = from p in db.Payees
-                        select p;
-            List<Payee> allPayees = query.ToList();
-            List<Int32> SelectedPayees = new List<Int32>();
+            string id = User.Identity.GetUserId();
+            AppUser user = db.Users.Find(id);
 
-            foreach (Payee payee in user.Payees)
-            {
-                SelectedPayees.Add(payee.PayeeID);
-            }
-
-            MultiSelectList list = new MultiSelectList(allPayees, "PayeeID", "Name", SelectedPayees);
+            List<Payee> other = (((db.Payees).ToList()).Except(user.Payees)).ToList();
+            SelectList list = new SelectList(other, "PayeeID", "Name");
             return list;
         }
 

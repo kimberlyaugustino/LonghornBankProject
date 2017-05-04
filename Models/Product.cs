@@ -25,6 +25,8 @@ namespace LonghornBankProject.Models
 
         public virtual AppUser Customer { get; set; }
 
+        public virtual StockPortfolio Portfolio { get; set; }
+
         public virtual List<Transaction> Transactions { get; set; }
 
         public Product()

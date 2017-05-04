@@ -11,6 +11,10 @@ using System.Data.Entity;
 
 namespace LonghornBankProject.Controllers
 {
+    public enum TransactionType { All, Deposit, Withdrawal, Transfer, Fee };
+    public enum PriceRange { All, r0_100, r100_200, r200_300, r300plus, custom_price_range }
+    public enum DateRange { All, Last15Days, Last30Days, Last45Days, Last60Days, custom_date_range }
+
     public class TransactionsController : BaseController
     {
         private AppDbContext db = new AppDbContext();
@@ -28,16 +32,11 @@ namespace LonghornBankProject.Controllers
                 return HttpNotFound();
             }
 
-            var query = from t in db.Transactions
-                        select t;
-            query = query.Where(t => t.Account.ProductID == id);
-            query = query.OrderBy(t => t.TransactionID);
-            List<Transaction> accountTransactions = query.ToList();
             ViewBag.ProductID = product.ProductID;
             ViewBag.AccountName = product.AccountName;
-            ViewBag.Balance = GetBalance(product).ToString("C2");
+            ViewBag.Balance = product.Balance.ToString("C2");
             ViewBag.AccountType = product.AccountType;
-            return View(accountTransactions);
+            return View(product.Transactions.ToList());
         }
 
         public ActionResult Details(int? id)
@@ -155,6 +154,7 @@ namespace LonghornBankProject.Controllers
                 transaction.TransactionType = "Deposit";
                 db.Transactions.Add(transaction);
                 product.Balance += transaction.Amount;
+                db.Entry(product).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index", new { id = transaction.Account.ProductID });
             }
@@ -215,6 +215,7 @@ namespace LonghornBankProject.Controllers
                     db.Transactions.Add(fee);
                     SelectedProduct.Balance += fee.Amount;
                 }
+                db.Entry(SelectedProduct).State = EntityState.Modified;
                 db.Transactions.Add(transaction);
                 db.SaveChanges();
                 return RedirectToAction("Index", new { id = transaction.Account.ProductID });
@@ -316,10 +317,125 @@ namespace LonghornBankProject.Controllers
                 db.Transactions.Add(transaction);
 
                 TransferProduct.Balance += Transfertransaction.Amount;
+                db.Entry(TransferProduct).State = EntityState.Modified;
+                db.Entry(SelectedProduct).State = EntityState.Modified;
                 db.SaveChanges();
                 return RedirectToAction("Index", new { id = transaction.Account.ProductID });
             }
             return View(transaction);
+        }
+
+        public ActionResult SearchResults(string SearchString, TransactionType SelectedTransType, PriceRange SelectedPriceRange, decimal? min, decimal? max, string SelectedTransNumber, DateRange SelectedDateRange, string custom_max_date)
+        {
+            var query = from a in db.Transactions
+                        select a;
+
+            //trans number
+
+            if (SelectedTransNumber != null && SelectedTransNumber != "")
+            {
+                int vari;
+                vari = Convert.ToInt32(SelectedTransNumber);
+                query = query.Where(a => a.TransactionID == vari);
+            }
+
+
+            //description
+            if (SearchString != null && SearchString != "")
+            { query = query.Where(a => a.Description.Contains(SearchString) || a.Description.Contains(SearchString)); }
+
+            //price range
+            if (SelectedPriceRange == PriceRange.All)
+            {
+                query = query.Where(a => a.Amount != 0);
+            }
+            else if (SelectedPriceRange == PriceRange.r0_100)
+            {
+                query = query.Where(a => a.Amount <= 100 && a.Amount >= 0);
+            }
+            else if (SelectedPriceRange == PriceRange.r100_200)
+            {
+                query = query.Where(a => a.Amount <= 200 && a.Amount >= 100);
+            }
+            else if (SelectedPriceRange == PriceRange.r200_300)
+            {
+                query = query.Where(a => a.Amount <= 300 && a.Amount >= 200);
+            }
+            else if (SelectedPriceRange == PriceRange.r300plus)
+            {
+                query = query.Where(a => a.Amount >= 300);
+            }
+            else if (SelectedPriceRange == PriceRange.custom_price_range)
+            {
+                query = query.Where(a => a.Amount >= min && a.Amount <= max);
+            }
+
+
+            //trans number
+            if (SelectedTransNumber != null && SelectedTransNumber != "")
+            {
+                int vari1 = Convert.ToInt32(SelectedTransNumber);
+                query = query.Where(a => a.TransactionID == vari1);
+
+            }
+
+            //date range
+            DateTime date;
+
+            if (SelectedDateRange == DateRange.All)
+            { }
+            else if (SelectedDateRange == DateRange.Last15Days)
+            {
+                date = DateTime.Today.AddDays(-15);
+                query = query.Where(a => a.Date >= date && a.Date <= DateTime.Today);
+            }
+            else if (SelectedDateRange == DateRange.Last30Days)
+            {
+                date = DateTime.Today.AddDays(-30);
+                query = query.Where(a => a.Date >= date && a.Date <= DateTime.Today);
+            }
+            else if (SelectedDateRange == DateRange.Last45Days)
+            {
+                date = DateTime.Today.AddDays(-45);
+                query = query.Where(a => a.Date >= date && a.Date <= DateTime.Today);
+            }
+            else if (SelectedDateRange == DateRange.Last60Days)
+            {
+                date = DateTime.Today.AddDays(-60);
+                query = query.Where(a => a.Date >= date && a.Date <= DateTime.Today);
+            }
+            else if (SelectedDateRange == DateRange.custom_date_range)
+            {
+                int vari3 = Convert.ToInt32(custom_max_date);
+                date = DateTime.Today.AddDays(-vari3);
+                query = query.Where(a => a.Date >= date && a.Date <= DateTime.Today);
+            }
+
+            //trans type
+            if (SelectedTransType == TransactionType.All)
+            { }
+            else if (SelectedTransType == TransactionType.Deposit)
+            {
+                query = query.Where(a => a.TransactionType == TransactionType.Deposit.ToString());
+            }
+            else if (SelectedTransType == TransactionType.Transfer)
+            {
+                query = query.Where(a => a.TransactionType == TransactionType.Transfer.ToString());
+            }
+            else if (SelectedTransType == TransactionType.Withdrawal)
+            {
+                query = query.Where(a => a.TransactionType == TransactionType.Withdrawal.ToString());
+            }
+            else if (SelectedTransType == TransactionType.Fee)
+            {
+                query = query.Where(a => a.TransactionType == TransactionType.Fee.ToString());
+            }
+
+
+            List<Transaction> SelectedTransactions = query.ToList();
+            SelectedTransactions.OrderByDescending(a => a.TransactionID).ThenByDescending(a => a.TransactionType).ThenByDescending(a => a.Description).ThenByDescending(a => a.Amount).ThenByDescending(a => a.Date);
+            ViewBag.TransactionsShown = "Showing " + SelectedTransactions.Count() + " out of " + db.Transactions.Count();
+            return View("Index", SelectedTransactions);
         }
     }
 }

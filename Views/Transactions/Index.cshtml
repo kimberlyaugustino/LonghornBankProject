@@ -1,21 +1,21 @@
 ﻿@model IEnumerable<LonghornBankProject.Models.Transaction>
-
+@using LonghornBankProject.Controllers
 @{
     ViewBag.Title = "Index";
 }
 
-<h2 style="text-align:left;float:left;">@ViewBag.AccountName</h2> 
-<h1 style="text-align:right;float:right;">@ViewBag.Balance</h1> 
-<hr style="clear:both;"/>
+<h2 style="text-align:left;float:left;">@ViewBag.AccountName</h2>
+<h1 style="text-align:right;float:right;">@ViewBag.Balance</h1>
+<hr style="clear:both;" />
 
 @if (ViewBag.AccountType == "IRA")
 {
     <p>
         @Html.ActionLink("Deposit", "Deposit", new { id = ViewBag.ProductID })
     </p>
-    <p>
-        @Html.ActionLink("Transfer", "Transfer", new { id = ViewBag.ProductID })
-    </p>
+        <p>
+            @Html.ActionLink("Transfer", "Transfer", new { id = ViewBag.ProductID })
+        </p>
 }
 else
 {
@@ -24,8 +24,107 @@ else
     </p>
 }
 
+@using (Html.BeginForm("SearchResults", "Transactions", FormMethod.Get))
+{
+
+    <p>
+        <div class="form-group">
+            <div class="form-check">
+                Transaction Number: @Html.TextBox("SelectedTransNumber", null, new { @class = "form-control" }) <br />
+            </div>
+            <div class="form-check">
+                Description: @Html.TextBox("SearchString", null, new { @class = "form-control" }) <br />
+            </div>
+            Price Range: <div class="form-group">
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.All, true, new { @class = "form-check-input" }) All
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.r0_100, false, new { @class = "form-check-input" }) 0-100
+                    </label>
+                </div>
+
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.r100_200, false, new { @class = "form-check-input" }) 100-200
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.r200_300, false, new { @class = "form-check-input" }) 200-300
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.r300plus, false, new { @class = "form-check-input" }) 300+
+                    </label>
+                </div>
+                <div class="form-check">
+                    <label class="form-check-label">
+                        @Html.RadioButton("SelectedPriceRange", PriceRange.custom_price_range, false, new { @class = "form-check-input" }) Custom Amount Range
+                    </label>
+                    <div class="form-check">
+                        Custom Range: between @Html.TextBox("min", null, new { @class = "form-control" })  and @Html.TextBox("max", null, new { @class = "form-control" })<br />
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-check">
+                Transaction Type : @Html.DropDownList("SelectedTransType", EnumHelper.GetSelectList(typeof(TransactionType)), new { @class = "form-control" })
+            </div>
+        </div>
+        Date Range: <div class="form-group">
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.All, true, new { @class = "form-check-input" }) All
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.Last15Days, false, new { @class = "form-check-input" }) Last 15 Days
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.Last30Days, false, new { @class = "form-check-input" }) Last 30 Days
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.Last45Days, false, new { @class = "form-check-input" }) Last 45 Days
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.Last60Days, false, new { @class = "form-check-input" }) Last 60 Days
+                </label>
+            </div>
+            <div class="form-check">
+                <label class="form-check-label">
+                    @Html.RadioButton("SelectedDateRange", DateRange.custom_date_range, false, new { @class = "form-check-input" }) Custom Date Range
+                </label>
+                <div class="form-check">
+                    Custom Range: between @Html.TextBox("custom_max_date", null, new { @class = "form-control" })<br />
+                </div>
+            </div>
+        </div>
+        <input type="submit" value="Search" class="btn btn-default" />
+    </p>
+
+}
+
+@ViewBag.TransactionsShown
 <table class="table">
     <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.TransactionID)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.Date)
         </th>
@@ -44,28 +143,32 @@ else
         <th></th>
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Date)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.TransactionType)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Description)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Amount)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Comments)
-        </td>
-        <td>
-            @Html.ActionLink("Details", "Details", new { id=item.TransactionID })
-        </td>
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransactionID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TransactionType)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Amount)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Comments)
+            </td>
+            <td>
+                @Html.ActionLink("Details", "Details", new { id = item.TransactionID })
+            </td>
+        </tr>
+    }
 
 </table>
 

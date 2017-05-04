@@ -76,17 +76,27 @@ namespace LonghornBankProject.Controllers
             {
                 if (dispute.Amount <= 0)
                 {
+                    ViewBag.transaction = TransactionID;
                     return View(dispute);
                 }
+
                 string id = User.Identity.GetUserId();
                 dispute.Customer = db.Users.Find(id);
-                dispute.Transaction = db.Transactions.Find(TransactionID);
-                if (dispute.Transaction.TransactionType == "Withdrawal")
+                Transaction transaction= db.Transactions.Find(TransactionID);
+
+                if (transaction.TransactionType != "Deposit" && transaction.TransactionType != "Transfer")
                 {
                     dispute.Amount = -dispute.Amount;
                 }
                 dispute.Status = "Submitted";
+                dispute.Transaction = transaction;
                 db.Disputes.Add(dispute);
+
+                if (transaction.TransactionType == "Bill Payment")
+                {
+                    transaction.Description = "Disputed [" + dispute.Status + "] " +transaction.Description;
+                }
+                db.Entry(transaction).State = EntityState.Modified;
                 db.SaveChanges();
                 ViewBag.Dispute = dispute.Status + " dispute";
                 return RedirectToAction("ConfirmDispute", new { id = TransactionID});

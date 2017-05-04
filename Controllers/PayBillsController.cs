@@ -20,36 +20,39 @@ namespace LonghornBankProject.Controllers
         {
             string id = User.Identity.GetUserId();
             AppUser user = db.Users.Find(id);
-            var model = new List<Transaction>();
-            foreach (var item in user.Payees)
+
+            var model = new List<PayeeTransaction>();
+            foreach (var payee in user.Payees)
             {
-                Transaction transaction = new Transaction();
-                transaction.Payee = item;
-                model.Add(transaction);
+                PayeeTransaction item = new PayeeTransaction();
+                item.Name = payee.Name;
+                item.Type = payee.Type;
+                model.Add(item);
             }
+
             ViewBag.List = model;
             ViewBag.AllAccounts = GetAllAccounts();
             return View(model.ToList());
         }
 
-        [HttpPost, ActionName("PayBills")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult PayBillsConfirmed([Bind(Include = "Date,Amount,Payee")] Transaction transaction, Int32 ProductID)
+        public ActionResult PayBills(PayeeTransaction model, Int32 ProductID)
         {
             if (ModelState.IsValid)
             {
-                Product SelectedProduct = db.Accounts.Find(ProductID);
-                transaction.Amount = transaction.Amount;
-                transaction.Date = transaction.Date;
-                if (transaction.Amount <= 0)
+                if (model.Amount <= 0)
                 {
                     ViewBag.Error = "Amount cannot be $0.00 or less.";
-                    return View(transaction);
+                    return RedirectToAction("PayBills");
                 }
-
+                Product SelectedProduct = db.Accounts.Find(ProductID);
+                Transaction transaction = new Transaction();
+                transaction.Amount = -model.Amount;
+                transaction.Date = model.Date;
                 transaction.Account = SelectedProduct;
-                transaction.Description = "Payment to " + transaction.Payee.Name + " for " + transaction.Payee.Type + " bill";
-                transaction.TransactionType = "Bill payment";
+                transaction.Description = "Payment to " + model.Name + " for " + model.Type + " bill";
+                transaction.TransactionType = "Bill Payment";
 
                 SelectedProduct.Balance += transaction.Amount;
                 if (SelectedProduct.Balance < 0)
@@ -57,20 +60,21 @@ namespace LonghornBankProject.Controllers
                     if (SelectedProduct.Balance < -50)
                     {
                         ViewBag.Message = "Transaction exceeds $50 overdraft limit";
-                        return View(transaction);
+                        return RedirectToAction("Withdrawal", "Transactions", new { transaction = transaction, ProductID = ProductID });
                     }
                     Transaction fee = new Transaction();
                     fee.Amount = -30;
                     fee.Description = "Overdraft fee";
-                    fee.Date = transaction.Date;
+                    fee.Date = model.Date;
                     fee.Account = SelectedProduct;
                     fee.TransactionType = "Overdraft Fee";
                     db.Transactions.Add(fee);
                     SelectedProduct.Balance += fee.Amount;
                 }
                 db.Transactions.Add(transaction);
+                db.Entry(SelectedProduct).State = EntityState.Modified;
                 db.SaveChanges();
-                return RedirectToAction("Withdrawal", new { item = transaction });
+                return RedirectToAction("Index", "Transactions", new { id = ProductID });
             }
             return RedirectToAction("PayBills");
 
@@ -101,9 +105,7 @@ namespace LonghornBankProject.Controllers
         [HttpGet]
         public ActionResult AddPayee()
         {
-            string id = User.Identity.GetUserId();
-            AppUser user = db.Users.Find(id);
-            ViewBag.AllPayees = GetAllPayees(user);
+            ViewBag.AllPayees = GetAllPayees();
             return View();
         }
 
@@ -125,7 +127,7 @@ namespace LonghornBankProject.Controllers
                 db.SaveChanges();
                 return RedirectToAction("PayBills");
             }
-            ViewBag.AllPayees = GetAllPayees(user);
+            ViewBag.AllPayees = GetAllPayees();
             return View();
         }
 
