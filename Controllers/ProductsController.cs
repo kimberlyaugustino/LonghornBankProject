@@ -24,15 +24,8 @@ namespace LonghornBankProject.Controllers
         [Authorize]
         public ActionResult Index()
         {
-            string customerid = User.Identity.GetUserId();
-
-            var query = from p in db.Accounts
-                        select p;
-            query = query.Where(p => p.Customer.Id == customerid);
-            query = query.OrderBy(p => p.ProductID);
-
-            List<Product> UserProducts = query.ToList();
-            return View(UserProducts);
+            AppUser customer = db.Users.Find(User.Identity.GetUserId());
+            return View(customer.Products.ToList());
         }
 
         // GET: Products/Details/5
@@ -76,7 +69,7 @@ namespace LonghornBankProject.Controllers
                     case "IRA":
                         return View("ConfirmIRA");
                     case "Stock":
-                        return RedirectToAction("CreateStock");
+                        return RedirectToAction("CreateStockPortfolio");
                 }
             }
             return View();
@@ -131,6 +124,24 @@ namespace LonghornBankProject.Controllers
             Product product = new Product();
             product.AccountName = "My IRA Account";
             product.AccountType = "IRA";
+            product.Customer = db.Users.Find(id);
+            db.Accounts.Add(product);
+            db.SaveChanges();
+            return RedirectToAction("Index", new { id = id });
+        }
+
+        public ActionResult CreateStockPortfolio()
+        {
+            string id = User.Identity.GetUserId();
+            Product product1 = db.Accounts.FirstOrDefault(x => x.AccountType == "Stock" && x.Customer.Id == id);
+            if (product1 != null)
+            {
+                return View("Error", new string[] { "Each account can only have one IRA account." });
+            }
+
+            Product product = new Product();
+            product.AccountName = "My Stock Portfolio";
+            product.AccountType = "Stock";
             product.Customer = db.Users.Find(id);
             db.Accounts.Add(product);
             db.SaveChanges();

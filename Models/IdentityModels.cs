@@ -68,6 +68,8 @@ namespace LonghornBankProject.Models
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<Payee> Payees { get; set; }
         public DbSet<Dispute> Disputes { get; set; }
+        public DbSet<Stock> Stocks { get; set; }
+        public DbSet<StockPortfolio> Portfolios { get; set; }
 
 
         //TODO: Make sure that your connection string name is correct here.
@@ -82,5 +84,7 @@ namespace LonghornBankProject.Models
         }
 
         public DbSet<AppRole> AppRoles { get; set; }
+
+        public System.Data.Entity.DbSet<LonghornBankProject.Models.StockQuote> StockQuotes { get; set; }
     }
 }

@@ -1,0 +1,28 @@
+﻿@model LonghornBankProject.Models.PayeeTransaction
+
+@using (Html.BeginForm("PayBills", "PayBills", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <td>
+        @Html.DropDownList("ProductID", (SelectList)ViewBag.AllAccounts, new { @class = "form-control" })
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.Name)
+        @Html.HiddenFor(model=>model.Name)
+    </td>
+    <td>
+        @Html.DisplayFor(model => model.Type)
+        @Html.HiddenFor(model=>model.Type)
+    </td>
+    <td>
+        @Html.EditorFor(model => model.Date, new { htmlAttributes = new { @class = "form-control" } })
+    </td>
+    <td>
+        @Html.EditorFor(model => model.Amount, new { htmlAttributes = new { @class = "form-control" } })
+    </td>
+    <td>
+        <input type="submit" value="Pay" class="btn btn-default" />
+    </td>
+
+}
+
